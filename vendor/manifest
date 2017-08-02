@@ -1,0 +1,76 @@
+{
+	"version": 0,
+	"dependencies": [
+		{
+			"importpath": "github.com/ethereum/go-ethereum/common",
+			"repository": "https://github.com/ethereum/go-ethereum",
+			"vcs": "git",
+			"revision": "bc0e6a5e68904b2a1251240b85dd97dc8fa07e11",
+			"branch": "master",
+			"path": "common",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/ethereum/go-ethereum/crypto",
+			"repository": "https://github.com/ethereum/go-ethereum",
+			"vcs": "git",
+			"revision": "bc0e6a5e68904b2a1251240b85dd97dc8fa07e11",
+			"branch": "master",
+			"path": "/crypto",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/ethereum/go-ethereum/rlp",
+			"repository": "https://github.com/ethereum/go-ethereum",
+			"vcs": "git",
+			"revision": "bc0e6a5e68904b2a1251240b85dd97dc8fa07e11",
+			"branch": "master",
+			"path": "rlp",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/ethereum/go-ethereum/vendor/github.com/aristanetworks/goarista/monotime",
+			"repository": "https://github.com/ethereum/go-ethereum",
+			"vcs": "git",
+			"revision": "bc0e6a5e68904b2a1251240b85dd97dc8fa07e11",
+			"branch": "master",
+			"path": "vendor/github.com/aristanetworks/goarista/monotime",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/ethereum/go-ethereum/vendor/github.com/btcsuite/btcd/btcec",
+			"repository": "https://github.com/ethereum/go-ethereum",
+			"vcs": "git",
+			"revision": "bc0e6a5e68904b2a1251240b85dd97dc8fa07e11",
+			"branch": "master",
+			"path": "vendor/github.com/btcsuite/btcd/btcec",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/google/gopacket",
+			"repository": "https://github.com/google/gopacket",
+			"vcs": "git",
+			"revision": "8af772c0bcc826f671fd7c133917fec9686d720d",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/net/bpf",
+			"repository": "https://go.googlesource.com/net",
+			"vcs": "git",
+			"revision": "f5079bd7f6f74e23c4d65efa0f4ce14cbd6a3c0f",
+			"branch": "master",
+			"path": "/bpf",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/sys/unix",
+			"repository": "https://go.googlesource.com/sys",
+			"vcs": "git",
+			"revision": "e312636bdaa2fac4f0acde9d17ab9fbad2b4ad10",
+			"branch": "master",
+			"path": "/unix",
+			"notests": true
+		}
+	]
+}
