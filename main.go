@@ -1,3 +1,7 @@
+// Command ethpd is an Ethereum UDP packet dissector for discovery protocol v4.
+//
+// Pass a pcap file to the command and it will print to stdout the decoded packets.
+// For larger pcap files, pipe out to a text file.
 package main
 
 import (
@@ -20,7 +24,7 @@ import (
 )
 
 var (
-	pcapFile string = os.Args[1]
+	pcapFile = os.Args[1]
 	handle   *pcap.Handle
 	err      error
 )
