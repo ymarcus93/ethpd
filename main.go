@@ -32,7 +32,7 @@ var (
 // Packet sizes
 const (
 	macSize  = 256 / 8           // 32
-	sigSize  = 520 / 8           // 65
+	sigSize  = 520 / 8           // 65 (512-bit signature + 1 byte more for recovery id)
 	headSize = macSize + sigSize // space of packet frame data
 )
 
@@ -69,7 +69,7 @@ type (
 
 	// findnode is a query for nodes close to the given target.
 	findnode struct {
-		Target     nodeID // doesn't need to be an actual public key
+		Target     NodeID // doesn't need to be an actual public key
 		Expiration uint64
 		// Ignore additional fields (for forward compatibility).
 		Rest []rlp.RawValue `rlp:"tail"`
@@ -89,7 +89,7 @@ type (
 		IP  net.IP // len 4 for IPv4 or 16 for IPv6
 		UDP uint16 // for discovery protocol
 		TCP uint16 // for RLPx protocol
-		ID  nodeID
+		ID  NodeID
 	}
 
 	rpcEndpoint struct {
@@ -99,16 +99,19 @@ type (
 	}
 )
 
-type nodeID [64]byte
+// NodeID is a unique identifier for each node.
+// The node identifier is a marshaled elliptic curve public key.
+// 512 bits.
+type NodeID [64]byte
 
-// String() returns nodeID as a long hexadecimal number.
-func (n nodeID) String() string {
+// String() returns NodeID as a long hexadecimal number.
+func (n NodeID) String() string {
 	return fmt.Sprintf("%x", n[:])
 }
 
 // recoverNodeID computes the public key used to sign the
 // given hash from the signature.
-func recoverNodeID(hash, sig []byte) (id nodeID, err error) {
+func recoverNodeID(hash, sig []byte) (id NodeID, err error) {
 	pubkey, err := secp256k1.RecoverPubkey(hash, sig)
 	if err != nil {
 		return id, err
@@ -126,18 +129,18 @@ func recoverNodeID(hash, sig []byte) (id nodeID, err error) {
 // ethereum packet data structures.
 //
 // Returns unknown type error, if data cannot be decoded
-func decode(buf []byte) (p interface{}, id nodeID, err error) {
+func decode(buf []byte) (hash []byte, p interface{}, id NodeID, err error) {
 	if len(buf) < headSize+1 {
-		return p, id, errors.New("packet too small")
+		return hash, p, id, errors.New("packet too small")
 	}
 	hash, sig, sigdata := buf[:macSize], buf[macSize:headSize], buf[headSize:]
 	shouldhash := crypto.Keccak256(buf[macSize:])
 	if !bytes.Equal(hash, shouldhash) {
-		return p, id, errors.New("bad hash")
+		return hash, p, id, errors.New("bad hash")
 	}
 	fromID, err := recoverNodeID(crypto.Keccak256(buf[headSize:]), sig)
 	if err != nil {
-		return p, id, err
+		return hash, p, id, err
 	}
 	switch ptype := sigdata[0]; ptype {
 	case pingPacket:
@@ -149,11 +152,11 @@ func decode(buf []byte) (p interface{}, id nodeID, err error) {
 	case neighborsPacket:
 		p = new(neighbors)
 	default:
-		return p, id, fmt.Errorf("unknown type: %d", ptype)
+		return hash, p, id, fmt.Errorf("unknown type: %d", ptype)
 	}
 	s := rlp.NewStream(bytes.NewReader(sigdata[1:]), 0)
 	err = s.Decode(p)
-	return p, fromID, err
+	return hash, p, fromID, err
 }
 
 // printPacket will print the decoded packet to the
@@ -174,7 +177,7 @@ func printPacket(packet gopacket.Packet, index int) {
 	fmt.Println("Packet length:", lengthPacket)
 
 	// Decode payload
-	decodedPayload, fromID, err := decode(payload)
+	hash, decodedPayload, fromID, err := decode(payload)
 	if err != nil {
 		fmt.Println("ERROR: ", err)
 	} else { // Print payload data
@@ -193,11 +196,12 @@ func printPacket(packet gopacket.Packet, index int) {
 		}
 		fmt.Println("Packet type:", packetType)
 		fmt.Println("Packet signed by:", fromID)
+		fmt.Println("Hash of packet:", hex.EncodeToString(hash))
 
 		// Print certain items of the decoded packets (depends on type)
 		if packetType == "Neighbors" {
 			nodesData := reflect.ValueOf(decodedPayload).Elem().FieldByName("Nodes")
-			fmt.Println("Nodes:")
+			fmt.Printf("Nodes: (%v)\n", nodesData.Len())
 			for i := 0; i < nodesData.Len(); i++ {
 				ipString := nodesData.Index(i).FieldByName("IP").Addr().Interface()
 				nodeUDP := nodesData.Index(i).FieldByName("UDP")
