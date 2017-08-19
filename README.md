@@ -17,8 +17,6 @@ With a [correctly configured](https://golang.org/doc/code.html#GOPATH) Go instal
 go get -u github.com/ymarcus93/ethpd
 ```
 
-Alternatively, download the provided binary in the Releases tab.
-
 ## Version 4 Packet Structure
 [See RLPx protocol page for more information](https://github.com/ethereum/devp2p/blob/master/rlpx.md)
 
